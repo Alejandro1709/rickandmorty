@@ -1,6 +1,6 @@
 function App() {
   return (
-    <div className='App'>
+    <>
       <header className='flex flex-col gap-2 bg-[#272B33] h-40 w-full'>
         <div className='flex flex-row gap-4 text-white p-4'>
           <input
@@ -19,8 +19,13 @@ function App() {
           </ul>
         </div>
       </header>
-      <div className=''>BOTTOM</div>
-    </div>
+      <main className='flex flex-col'>
+        <article className='bg-red-200 h-[240px]'></article>
+        <article className='bg-red-300 h-[240px]'></article>
+        <article className='bg-red-400 h-[240px]'></article>
+        <article className='bg-red-500 h-[240px]'></article>
+      </main>
+    </>
   );
 }
 
