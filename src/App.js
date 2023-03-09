@@ -1,64 +1,60 @@
 import { useEffect, useState } from 'react';
+import Header from './components/Header';
+import Main from './components/Main';
 
 function App() {
-  const [initialCharacters] = useState(
-    JSON.parse(localStorage.getItem('characters'))
-  );
-  const [, setCharacters] = useState([]);
-  const [filteredCharacters, setFilteredCharacters] = useState([]);
-
+  const [, setInitialCharacters] = useState([]);
+  const [characters, setCharacters] = useState([]);
+  const [currentCharacter, setCurrentCharacter] = useState({});
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [input, setInput] = useState('');
 
   useEffect(() => {
+    setLoading(true);
     fetch('https://rickandmortyapi.com/api/character')
       .then((res) => res.json())
       .then(({ results }) => {
+        setInitialCharacters(characters);
         localStorage.setItem('characters', JSON.stringify(results));
         setCharacters(results);
+        setCurrentCharacter(results[3]);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.log(err);
+        setError(error);
       });
   }, []);
 
   const handleFilter = (e) => {
     setInput(e.target.value);
 
-    const filteredCharacters = initialCharacters.filter((c) =>
-      c.name.toLowerCase().includes(input.toLowerCase())
+    const charactersFromStorage = JSON.parse(
+      localStorage.getItem('characters')
     );
 
-    setFilteredCharacters(filteredCharacters);
+    const filteredCharacters = charactersFromStorage.filter((c) =>
+      c.name.toLowerCase().includes(e.target.value.toLowerCase())
+    );
 
-    console.log(filteredCharacters);
+    setCharacters(filteredCharacters);
   };
 
   return (
     <>
-      <header className='flex flex-col gap-2 bg-midnight h-40 w-full'>
-        <div className='flex flex-row gap-4 text-white p-4'>
-          <input
-            className='flex-1 bg-midnight p-2 rounded-md'
-            type='text'
-            placeholder='Search here...'
-            value={input}
-            onChange={handleFilter}
-          />
-          <button className='bg-midnightLight rounded-md'>Search</button>
-        </div>
-        <div className='flex bg-midnight overflow-scroll'>
-          <ul className='flex flex-row'>
-            {filteredCharacters.map((c) => (
-              <li key={c.id} className='h-20 w-20 bg-gray-400 bg-cover'>
-                <img src={c.image} alt={c.name} />
-              </li>
-            ))}
-          </ul>
-        </div>
-      </header>
-      <main className='flex flex-col'>
-        <article className='bg-red-200 h-[240px]'></article>
-        <article className='bg-red-300 h-[240px]'></article>
-        <article className='bg-red-400 h-[240px]'></article>
-        <article className='bg-red-500 h-[240px]'></article>
-      </main>
+      <Header
+        input={input}
+        characters={characters}
+        onFilter={handleFilter}
+        onCharChange={setCurrentCharacter}
+      />
+      <Main
+        loading={loading}
+        error={error}
+        character={currentCharacter}
+        onCharacterClick={setCurrentCharacter}
+      />
     </>
   );
 }
